@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -22,6 +22,27 @@ const Login = () => {
         });
 
     }
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+      if(token){
+        axios.get('http://localhost:8000/api/user', {
+          headers: {
+            Authorization: `${token}`
+          }
+
+        }).then((response) => {
+          console.log(response)
+          navigate('/')
+        }
+        ).catch((error) => {
+          console.error(error)
+        })
+
+      }
+    }
+    , [])
 
   return (
     <div className="min-h-screen flex items-center justify-center w-full ">

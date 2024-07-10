@@ -6,12 +6,14 @@ import {
 } from "react-router-dom";
 import Login from "./components/auth/Login";
 import Home from "./components/Home";
+import Register from "./components/auth/Register";
 
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/" element={<Home />} />
       </>
     )

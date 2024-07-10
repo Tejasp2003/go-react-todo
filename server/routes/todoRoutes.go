@@ -13,6 +13,10 @@ func TodoRoutes(app *fiber.App) {
     api.Get("/todos/:todoId", controllers.GetTodoById)
     api.Post("/todos", controllers.CreateTodo)
     api.Put("/todos/:todoId", controllers.UpdateTodo)
-    api.Put("/todos/:todoId/complete", controllers.MarkTodoAsCompleted)
+    api.Put("/todos/:todoId/complete", controllers.ToggleTodoCompletion)
     api.Delete("/todos/:todoId", controllers.DeleteTodo)
+    
+    api.Get("/user", controllers.GetUserFromToken)
+
+    
 }

@@ -8,4 +8,5 @@ import (
 func AuthRoutes(app *fiber.App) {
     app.Post("/register", controllers.Register)
     app.Post("/login", controllers.Login)
+    
 }

@@ -136,7 +136,7 @@ func UpdateTodo(c *fiber.Ctx) error {
 	return c.JSON(todo)
 }
 
-func MarkTodoAsCompleted(c *fiber.Ctx) error {
+func ToggleTodoCompletion(c *fiber.Ctx) error {
 	token := string(c.Request().Header.Peek("Authorization"))
 	userId, err := utils.ValidateToken(token)
 	errorHandler(err, c, "Unauthorized")
@@ -147,17 +147,32 @@ func MarkTodoAsCompleted(c *fiber.Ctx) error {
 
 	collection := config.GetCollection(config.DB, "users")
 
+	// Fetch the user and todo to get the current completion status
+	var user models.User
 	filter := bson.M{"_id": userObjID, "todos._id": todoId}
-	update := bson.M{
-		"$set": bson.M{
-			"todos.$.done": true,
-		},
+	err = collection.FindOne(context.Background(), filter).Decode(&user)
+	errorHandler(err, c, "Cannot find user")
+
+	var currentTodo *models.Todo
+	for _, todo := range user.Todos {
+		if todo.ID == todoId {
+			currentTodo = &todo
+			break
+		}
 	}
+
+	if currentTodo == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Todo not found"})
+	}
+
+	// Toggle the completion status
+	toggleStatus := !currentTodo.Done
+	update := bson.M{"$set": bson.M{"todos.$.done": toggleStatus}}
+
 	_, err1 := collection.UpdateOne(context.Background(), filter, update)
 	errorHandler(err1, c, "Cannot update todo")
 
-	return c.JSON(fiber.Map{"message": "Todo marked as completed"})
-
+	return c.JSON(fiber.Map{"message": "Todo completion status toggled"})
 }
 
 // DeleteTodo deletes a todo for a user
@@ -194,3 +209,20 @@ func DeleteTodo(c *fiber.Ctx) error {
 
 
 
+
+func GetUserFromToken(c *fiber.Ctx) error {
+	token := string(c.Request().Header.Peek("Authorization"))
+	userId, err := utils.ValidateToken(token)
+	errorHandler(err, c, "Unauthorized")
+
+	userObjID, err := primitive.ObjectIDFromHex(userId)
+	errorHandler(err, c, "Invalid user ID")
+
+	collection := config.GetCollection(config.DB, "users")
+
+	var user models.User
+	err = collection.FindOne(context.Background(), bson.M{"_id": userObjID}).Decode(&user)
+	errorHandler(err, c, "Cannot find user")
+
+	return c.JSON(user)
+}
