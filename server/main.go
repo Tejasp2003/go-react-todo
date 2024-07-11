@@ -41,7 +41,7 @@ func main() {
 	routes.AuthRoutes(app)
     routes.TodoRoutes(app)
 
-	setUpRoutes(app)
+	
 
 	
 	log.Fatal(app.Listen(":" + port))
