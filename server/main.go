@@ -1,17 +1,19 @@
 package main
 
 import (
+	
 	"log"
-	"os"
+
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/joho/godotenv"
 	"github.com/tejasp2003/go-react-todo/config"
 	"github.com/tejasp2003/go-react-todo/routes"
 )
 
 func main() {
+
+	const PORT = "8000"
 	config.ConnectDB()
 
 	app := fiber.New()
@@ -26,16 +28,9 @@ func main() {
     }))
 
 		
-	err := godotenv.Load()
-    if err != nil {
-        log.Fatal("Error loading .env file")
-    }
+	
 
-	// Get the value of the key "PORT" from the .env file	
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8000"
-	}
+
 
 
 	routes.AuthRoutes(app)
@@ -44,6 +39,6 @@ func main() {
 	
 
 	
-	log.Fatal(app.Listen(":" + port))
+	log.Fatal(app.Listen(":" + PORT))
 
 }
